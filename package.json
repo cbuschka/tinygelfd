@@ -1,0 +1,15 @@
+{
+  "name": "@cbuschka/tinylogd",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "graygelf": "^1.2.0",
+    "winston": "^3.1.0",
+    "winston-daily-rotate-file": "^3.5.2"
+  }
+}
