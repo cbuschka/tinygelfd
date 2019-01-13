@@ -4,6 +4,15 @@ const winston = require('winston');
 const gelfserver = require('graygelf/server')
 require('winston-daily-rotate-file');
 
+const defaultConfig = require('./config.js');
+const configFile = process.env['CONFIG_FILE'];
+let customConfig = {};
+if( configFile ) {
+  log("Loading config from", configFile, "...");
+  customConfig = require(configFile);
+}
+const config = Object.assign({}, defaultConfig, customConfig);
+
 function pad(number) {
       if (number < 10) {
         return '0' + number;
@@ -23,7 +32,7 @@ function formatDate(d) {
 
 function log() {
   const args = [];
-  args.push(formatDate(new Date())+":");
+  args.push(formatDate(new Date()));
   for(let i=0; i<arguments.length; ++i) { args.push(arguments[i]); }
   console.log.apply(console, args);
 }
@@ -63,8 +72,10 @@ server.on('message', function (message) {
   message.level = winstonLevelByGelfLevel[message.level] || 'verbose';
   logger.log(message);
 })
-server.listen(12201);
-log("tinylogd ready...");
+const port = config.server.port || 12201;
+const address = config.server.address || '127.0.0.1';
+server.listen(port, address);
+log("Server ready on udp", address, "port", port, "...");
 
 const signals = ['SIGTERM', 'SIGINT'];
 signals.forEach(function(signal) {
@@ -87,4 +98,4 @@ const gcTimer = setInterval(function() {
       log("Evicted logger", key, ". Logger(s) left: [",Object.keys(loggers).join(),"].");
     }
   });
-}, 1000);
+}, 10*1000);
