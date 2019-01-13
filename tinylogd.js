@@ -23,9 +23,9 @@ function getLogger(loggers, tag) {
       ]
     });
     loggers[tag] = loggerSlot;
-    console.log("New logger ", tag, " created.");
+    console.log("New logger", tag, "created.");
   }
-  loggerSlot.lastUsedMillies = Date.now();
+  loggerSlot.lastUsedMillis = Date.now();
   return loggerSlot.logger;
 }
 
@@ -42,10 +42,25 @@ server.on('message', function (message) {
 server.listen(12201);
 console.log("tinylogd ready...");
 
-var signals = ['SIGTERM', 'SIGINT'];
+const signals = ['SIGTERM', 'SIGINT'];
 signals.forEach(function(signal) {
   process.on(signal, function () {
     console.log("Shutting down...");
+    clearInterval(gcTimer);
     server.close();
   });
 });
+
+
+const gcTimer = setInterval(function() {
+  const keys = Object.keys(loggers);
+  keys.forEach(function(key) {
+    const loggerSlot = loggers[key];
+    const lastUsedMillis = loggerSlot.lastUsedMillis;
+    if( !lastUsedMillis || lastUsedMillis < Date.now()-10*1000 ) {
+      loggerSlot.logger.end();
+      delete loggers[key];
+      console.log("Evicted logger", key, ". Logger(s) left: ",Object.keys(loggers),".");
+    }
+  });
+}, 1000);
