@@ -2,10 +2,11 @@ FROM node:10-stretch-slim
 
 ENV CONFIG_FILE=
 
-ADD / /tinylogd
+ADD /src/ /tinygelfd
+ADD /node_modules /tinygelfd/node_modules/
 
 EXPOSE 12201/udp
 
 VOLUME [ "/logs", "/config" ]
 
-CMD [ "/tinylogd/tinylogd.js" ]
+CMD [ "/tinygelfd/tinygelfd.js" ]

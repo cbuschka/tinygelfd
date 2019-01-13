@@ -1,12 +1,12 @@
 {
-  "name": "@cbuschka/tinylogd",
+  "name": "@cbuschka/tinygelfd",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/tinygelfd.js",
   "scripts": {
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Cornelius Buschka <cbuschka@gmail.com>",
+  "license": "MIT",
   "dependencies": {
     "graygelf": "^1.2.0",
     "winston": "^3.1.0",
