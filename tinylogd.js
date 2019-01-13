@@ -5,9 +5,9 @@ const gelfserver = require('graygelf/server')
 require('winston-daily-rotate-file');
 
 function getLogger(loggers, tag) {
-  let logger = loggers[tag];
-  if( !logger ) {
-    logger = loggers[tag] = winston.createLogger({
+  const loggerSlot = loggers[tag] || {};
+  if( !loggerSlot.logger ) {
+    loggerSlot.logger = winston.createLogger({
       exitOnError: false,
       level: 'verbose',
       transports: [
@@ -22,9 +22,11 @@ function getLogger(loggers, tag) {
         })
       ]
     });
+    loggers[tag] = loggerSlot;
     console.log("New logger ", tag, " created.");
   }
-  return logger;
+  loggerSlot.lastUsedMillies = Date.now();
+  return loggerSlot.logger;
 }
 
 const server = gelfserver()
