@@ -73,7 +73,7 @@ server.on('message', function (message) {
   logger.log(message);
 })
 const port = config.server.port || 12201;
-const address = config.server.address || '127.0.0.1';
+const address = config.server.address || '0.0.0.0';
 server.listen(port, address);
 log("Server ready on udp", address, "port", port, "...");
 
@@ -89,13 +89,18 @@ signals.forEach(function(signal) {
 
 const gcTimer = setInterval(function() {
   const keys = Object.keys(loggers);
+  const evictedKeys = [];
   keys.forEach(function(key) {
     const loggerSlot = loggers[key];
     const lastUsedMillis = loggerSlot.lastUsedMillis;
     if( !lastUsedMillis || lastUsedMillis < Date.now()-10*1000 ) {
       loggerSlot.logger.end();
+      evictedKeys.push(key);
       delete loggers[key];
-      log("Evicted logger", key, ". Logger(s) left: [",Object.keys(loggers).join(),"].");
     }
   });
+
+  if( evictedKeys.length > 0 ) {
+    log("Evicted logger(s)", evictedKeys, ". Logger(s) left: [",Object.keys(loggers).join(),"].");
+  }
 }, 10*1000);
